@@ -1,0 +1,31 @@
+# Data (patient-level data — not redistributed)
+data/
+*.csv.gz
+*.parquet
+
+# Trained model artifacts (large binaries)
+results/models/
+*.pkl
+*.joblib
+
+# Python
+__pycache__/
+*.py[cod]
+.env
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

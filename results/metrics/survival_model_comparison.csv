@@ -1,0 +1,6 @@
+Model,C-index,IBS
+GradientBoostingSurvival,0.7093,
+RandomSurvivalForest,0.707,
+CoxnetSurvival,0.7059,
+CoxPH,0.7046,
+ExtraSurvivalTrees,0.7045,
