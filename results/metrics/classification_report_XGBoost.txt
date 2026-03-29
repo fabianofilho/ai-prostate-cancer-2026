@@ -1,0 +1,9 @@
+Model: XGBoost
+              precision    recall  f1-score   support
+
+        Vivo       0.80      0.66      0.73      1278
+       Obito       0.59      0.75      0.66       832
+
+    accuracy                           0.70      2110
+   macro avg       0.70      0.71      0.69      2110
+weighted avg       0.72      0.70      0.70      2110

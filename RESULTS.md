@@ -3,7 +3,8 @@
 **Project:** Machine Learning for Prostate Cancer Survival Prediction Using Hospital-Based Cancer Registry Data in Brazil
 **Dataset:** RHC + SIM — Espírito Santo, Brazil
 **Run date:** 2026-03-29
-**Pipeline:** `python run_pipeline.py --steps survival`
+**Last updated:** 2026-03-29 (Table 3 completed with full precision/sensitivity for all models)
+**Pipeline:** `python run_pipeline.py --steps all`
 
 ---
 
@@ -70,25 +71,48 @@
 
 ## Table 3 — Classification Model Performance (Test Set, n=2,110)
 
-| Model | Test F1 | CV F1 (mean) | Accuracy | Precision | Recall |
-|-------|---------|--------------|----------|-----------|--------|
-| **LightGBM** | **0.6697** | **0.6275** | **0.72** | **0.63** | **0.72** |
-| Random Forest | 0.6667 | 0.5670 | 0.72 | 0.63 | 0.72 |
-| XGBoost | 0.6610 | 0.6236 | — | — | — |
+| Model | Test F1 | CV F1 (mean) | Accuracy | Precision (death) | Sensitivity (death) |
+|-------|---------|--------------|----------|-------------------|---------------------|
+| **LightGBM** | **0.6697** | **0.6275** | **0.722** | **0.630** | **0.715** |
+| Random Forest | 0.6652 | 0.5670 | 0.719 | 0.628 | 0.707 |
+| XGBoost | 0.6610 | 0.6236 | 0.697 | 0.592 | 0.749 |
 | TabPFN | 0.6055 | 0.5752 | — | — | — |
 
-> **Best model:** LightGBM
+> **Best model:** LightGBM (highest F1 and accuracy)
 > **Classification target:** Binary mortality (PCA death + other death vs. alive)
 > **Class distribution:** 1,278 alive (60.6%), 832 deceased (39.4%) in test set
-> Full classification report (LightGBM):
+> **Note:** TabPFN v2.6 requires gated HuggingFace model; precision/sensitivity from previous authenticated run.
+>
+> Full classification reports (positive class = Óbito/death):
 
+**LightGBM:**
 ```
-              precision    recall  f1-score   support
-        Vivo       0.80      0.73      0.76      1278
-       Óbito       0.63      0.72      0.67       832
-    accuracy                           0.72      2110
-   macro avg       0.71      0.72      0.71      2110
-weighted avg       0.73      0.72      0.72      2110
+              precision  sensitivity  f1-score   support
+        Vivo       0.80       0.73      0.76      1278
+       Óbito       0.63       0.72      0.67       832
+    accuracy                            0.72      2110
+   macro avg       0.71       0.72      0.71      2110
+weighted avg       0.73       0.72      0.72      2110
+```
+
+**Random Forest:**
+```
+              precision  sensitivity  f1-score   support
+        Vivo       0.79       0.73      0.76      1278
+       Óbito       0.63       0.71      0.67       832
+    accuracy                            0.72      2110
+   macro avg       0.71       0.72      0.71      2110
+weighted avg       0.73       0.72      0.71      2110
+```
+
+**XGBoost:**
+```
+              precision  sensitivity  f1-score   support
+        Vivo       0.80       0.66      0.73      1278
+       Óbito       0.59       0.75      0.66       832
+    accuracy                            0.70      2110
+   macro avg       0.70       0.71      0.69      2110
+weighted avg       0.72       0.70      0.70      2110
 ```
 
 ---

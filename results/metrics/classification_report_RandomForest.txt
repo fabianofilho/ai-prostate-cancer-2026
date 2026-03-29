@@ -1,0 +1,9 @@
+Model: RandomForest
+              precision    recall  f1-score   support
+
+        Vivo       0.79      0.73      0.76      1278
+       Obito       0.63      0.71      0.67       832
+
+    accuracy                           0.72      2110
+   macro avg       0.71      0.72      0.71      2110
+weighted avg       0.73      0.72      0.72      2110
