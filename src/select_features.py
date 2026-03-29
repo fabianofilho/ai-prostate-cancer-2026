@@ -44,8 +44,8 @@ def select_features():
 
     # 3. Configure and run Boruta
     logger.info("Configuring and running BorutaPy...")
-    rf_boruta = RandomForestClassifier(n_jobs=-1, class_weight=\"balanced\", **config.BORUTA_PARAMS)
-    feat_selector = BorutaPy(rf_boruta, n_estimators=\"auto\", verbose=0, random_state=config.RANDOM_STATE)
+    rf_boruta = RandomForestClassifier(n_jobs=-1, class_weight="balanced", **config.BORUTA_PARAMS)
+    feat_selector = BorutaPy(rf_boruta, n_estimators="auto", verbose=0, random_state=config.RANDOM_STATE)
     
     feat_selector.fit(X_train.values, y_train.values)
 
@@ -61,7 +61,7 @@ def select_features():
 
     # 5. Save results
     # Save the list of selected features
-    features_path = f"{config.DIRS[\"importances\"]}/selected_features.joblib"
+    features_path = config.DIRS["importances"] + "/selected_features.joblib"
     joblib.dump(cols_selected, features_path)
     logger.info(f"List of selected features saved to {features_path}")
 

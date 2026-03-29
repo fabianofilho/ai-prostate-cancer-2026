@@ -73,7 +73,7 @@ def train_models():
 
         # Store the best estimator
         trained_models[name] = best_estimator
-        model_path = f"{config.DIRS[\"models\"]}/{name}_best_model.pkl"
+        model_path = config.DIRS["models"] + f"/{name}_best_model.pkl"
         joblib.dump(best_estimator, model_path)
         logger.info(f"    Saved best {name} model to {model_path}")
 

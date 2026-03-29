@@ -42,7 +42,7 @@ def evaluate_models():
     results_data = []
     trained_models = {}
     for name in config.MODELS_MAP.keys():
-        model_path = f"{config.DIRS[\"models\"]}/{name}_best_model.pkl"
+        model_path = config.DIRS["models"] + f"/{name}_best_model.pkl"
         try:
             model = joblib.load(model_path)
             trained_models[name] = model
@@ -59,8 +59,8 @@ def evaluate_models():
         return
 
     ranking_df = pd.DataFrame(results_data).sort_values(by="Test_F1", ascending=False)
-    ranking_df.to_csv(f"{config.DIRS[\"metrics\"]}/model_ranking_optimized.csv", index=False)
-    logger.info(f"Model ranking saved to {config.DIRS[\"metrics\"]}/model_ranking_optimized.csv")
+    ranking_df.to_csv(config.DIRS["metrics"] + "/model_ranking_optimized.csv", index=False)
+    logger.info("Model ranking saved to " + config.DIRS["metrics"] + "/model_ranking_optimized.csv")
 
     best_model_name = ranking_df.iloc[0]["Model"]
     best_model = trained_models[best_model_name]
@@ -87,7 +87,7 @@ def generate_comparison_plots(models, X_test, y_test):
     plt.title("ROC Curve Comparison")
     plt.legend(loc="lower right")
     plt.grid(True, alpha=0.3)
-    plt.savefig(f"{config.DIRS[\"plots\"]}/all_models_roc_comparison.png", dpi=config.FIGURE_DPI)
+    plt.savefig(config.DIRS["plots"] + "/all_models_roc_comparison.png", dpi=config.FIGURE_DPI)
     plt.close()
 
 def generate_final_report(model, model_name, X_test, y_test):
@@ -95,7 +95,7 @@ def generate_final_report(model, model_name, X_test, y_test):
     logger.info(f"Generating final report for the best model: {model_name}")
     y_pred = model.predict(X_test)
     report = classification_report(y_test, y_pred, target_names=["Vivo", "Óbito"])
-    with open(f"{config.DIRS[\"metrics\"]}/classification_report_{model_name}.txt", "w") as f:
+    with open(config.DIRS["metrics"] + f"/classification_report_{model_name}.txt", "w") as f:
         f.write(report)
 
     plt.figure(figsize=(6, 5))
@@ -103,7 +103,7 @@ def generate_final_report(model, model_name, X_test, y_test):
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", 
                 xticklabels=["Pred: Vivo", "Pred: Óbito"], yticklabels=["Real: Vivo", "Real: Óbito"])
     plt.title(f"Confusion Matrix: {model_name}")
-    plt.savefig(f"{config.DIRS[\"plots\"]}/confusion_matrix_{model_name}.png", dpi=config.FIGURE_DPI)
+    plt.savefig(config.DIRS["plots"] + f"/confusion_matrix_{model_name}.png", dpi=config.FIGURE_DPI)
     plt.close()
 
 def generate_shap_summary(model, model_name, X_test):
@@ -124,13 +124,13 @@ def generate_shap_summary(model, model_name, X_test):
         # SHAP Summary Plot (Beeswarm)
         plt.figure()
         shap.summary_plot(vals, X_test, show=False)
-        plt.savefig(f"{config.DIRS[\"plots\"]}/shap_summary_beeswarm.png", dpi=config.FIGURE_DPI, bbox_inches="tight")
+        plt.savefig(config.DIRS["plots"] + "/shap_summary_beeswarm.png", dpi=config.FIGURE_DPI, bbox_inches="tight")
         plt.close()
 
         # SHAP Importance Plot (Bar)
         plt.figure()
         shap.summary_plot(vals, X_test, plot_type="bar", show=False)
-        plt.savefig(f"{config.DIRS[\"plots\"]}/shap_importance_bar.png", dpi=config.FIGURE_DPI, bbox_inches="tight")
+        plt.savefig(config.DIRS["plots"] + "/shap_importance_bar.png", dpi=config.FIGURE_DPI, bbox_inches="tight")
         plt.close()
         logger.info("SHAP plots saved successfully.")
 
