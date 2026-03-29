@@ -81,7 +81,7 @@
 > **Best model:** LightGBM (highest F1 and accuracy)
 > **Classification target:** Binary mortality (PCA death + other death vs. alive)
 > **Class distribution:** 1,278 alive (60.6%), 832 deceased (39.4%) in test set
-> **Note:** TabPFN v2.6 requires gated HuggingFace model; precision/sensitivity from previous authenticated run.
+> **Note on TabPFN:** TabPFN v2.6 (Prior-Labs) requer download de modelo gated via HuggingFace com aceite explícito de termos de uso (`https://huggingface.co/Prior-Labs/tabpfn_2_6`). O F1=0.6055 e CV F1=0.5752 foram obtidos em sessão anterior com autenticação ativa. Precision e sensitivity não estão disponíveis pois o modelo `.pkl` não é versionado no repositório (gitignore). Para reproduzir: `hf auth login` + `python run_pipeline.py --steps train evaluate`.
 >
 > Full classification reports (positive class = Óbito/death):
 
