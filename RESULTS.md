@@ -3,14 +3,14 @@
 **Project:** Machine Learning for Prostate Cancer Survival Prediction Using Hospital-Based Cancer Registry Data in Brazil
 **Dataset:** RHC + SIM — Espírito Santo, Brazil
 **Run date:** 2026-03-29
-**Last updated:** 2026-03-29 (Table 3 completed with full precision/sensitivity for all models)
+**Last updated:** 2026-06-28 (updated with manuscript figures — main.tex PLOS Medicine)
 **Pipeline:** `python run_pipeline.py --steps all`
 
 ---
 
 ## Table 1 — Study Population Characteristics
 
-| Characteristic | Overall (N=10,550) | Alive (n=6,388) | Deceased (n=4,162) | p-value |
+| Characteristic | Overall (N=10,552) | Alive (n=6,388) | Deceased (n=4,164) | p-value |
 |---|---|---|---|---|
 | **Age at diagnosis, mean (SD)** | 69.2 (9.1) | 67.3 (8.7) | 72.1 (8.9) | <0.001 |
 | **Age group, n (%)** | | | | <0.001 |
@@ -44,92 +44,77 @@
 
 ---
 
-## Table 2 — Boruta-Selected Features (16 variables)
+## Table 2 — Boruta-Selected Features (13 variables)
 
-| # | Feature | Description | Domain | Missingness |
-|---|---------|-------------|--------|-------------|
-| 1 | IDADE | Age at diagnosis (years) | Demographics | 0.0% |
-| 2 | ESTADIAM_1 | Clinical stage I indicator | Clinical staging | 47.9% |
-| 3 | ESTADIAM_4 | Clinical stage IV indicator | Clinical staging | 47.9% |
-| 4 | ESTADIAM_Ignorado | Unknown clinical stage indicator | Clinical staging | 47.9% |
-| 5 | PTNM_T2N0M0 | Pathological TNM category T2N0M0 | Pathological staging | 26.3% |
-| 6 | PTNM_T2NxMx | Pathological TNM category T2NxMx | Pathological staging | 26.3% |
-| 7 | PTNM_T2_outros | Other pathological T2 variants | Pathological staging | 26.3% |
-| 8 | PTNM_NA | Pathological TNM not applicable | Pathological staging | 26.3% |
-| 9 | RAZAONT_2.0 | Race/ethnicity category indicator (Black) | Sociodemographic | 8.1% |
-| 10 | RAZAONT_6.0 | Race/ethnicity category indicator (other) | Sociodemographic | 8.1% |
-| 11 | TABAGISM_3.0 | Former smoker status indicator | Behavioral | 40.0% |
-| 12 | CLINENTR_31.0 | Poor clinical condition at presentation | Clinical condition | 0.3% |
-| 13 | CUSTDIAGTUMOR_8.0 | Diagnostic cost-category indicator | Economic | 1.8% |
-| 14 | CUSTRATAMTUMOR_8.0 | Treatment cost-category indicator | Economic | 3.2% |
-| 15 | UN_HOSP_HUCAM | Hospital unit indicator (HUCAM) | Institutional | 0.0% |
-| 16 | OCUPACAO_Ignorado | Unknown occupation indicator | Socioeconomic | 30.3% |
+| # | Feature | Description | Domain |
+|---|---------|-------------|--------|
+| 1 | IDADE | Age at diagnosis (years) | Demographic |
+| 2 | UN_HOSP_HUCAM | Hospital unit indicator (HUCAM) | Institutional |
+| 3 | OCUPACAO_Ignorado | Unknown occupation indicator | Socioeconomic |
+| 4 | ESTADIAM_1 | Clinical stage I indicator | Staging |
+| 5 | ESTADIAM_4 | Clinical stage IV indicator | Staging |
+| 6 | ESTADIAM_Ignorado | Unknown clinical stage indicator | Staging |
+| 7 | PTNM_T2N0M0 | Pathological TNM T2N0M0 | Staging |
+| 8 | PTNM_T2_outros | Other pathological T2 variants | Staging |
+| 9 | PTNM_NA | Pathological TNM not applicable | Staging |
+| 10 | ALCOOL_Ignorado | Unknown alcohol use indicator | Behavioral |
+| 11 | CLINENTR_31.0 | Performance status 3 (bedridden <50% of day) | Clinical |
+| 12 | CUSTDIAGTUMOR_NA | Diagnostic funding not applicable | Economic |
+| 13 | CUSTRATAMTUMOR_NA | Treatment funding not applicable | Economic |
 
 > Feature selection method: BorutaPy with RandomForestClassifier (max_depth=7, n_estimators=auto, random_state=42)
+> Note: staging variables dominate (6 of 13); several predictors encode absence of information (unknown stage, unknown occupation, unknown alcohol use, funding not applicable), suggesting missingness itself carries prognostic signal.
 
 ---
 
-## Table 3 — Classification Model Performance (Test Set, n=2,110)
+## Table 3 — Classification Model Performance (5-year mortality, test set n=2,110)
 
-| Model | Test F1 | CV F1 (mean) | Accuracy | Precision (death) | Sensitivity (death) |
-|-------|---------|--------------|----------|-------------------|---------------------|
-| **LightGBM** | **0.6697** | **0.6275** | **0.722** | **0.630** | **0.715** |
-| Random Forest | 0.6652 | 0.5670 | 0.719 | 0.628 | 0.707 |
-| XGBoost | 0.6610 | 0.6236 | 0.697 | 0.592 | 0.749 |
-| TabPFN | 0.6055 | 0.5752 | — | — | — |
+| Model | Test F1 | AUC | Accuracy | Precision (death) | Recall (death) |
+|-------|---------|-----|----------|-------------------|----------------|
+| **LightGBM** | **0.515** | **0.764** | **0.751** | **0.44** | **0.61** |
+| XGBoost | 0.507 | 0.764 | — | — | — |
+| Random Forest | 0.502 | 0.753 | — | — | — |
+| TabPFN | 0.405 | — | — | — | — |
 
-> **Best model:** LightGBM (highest F1 and accuracy)
-> **Classification target:** Binary mortality (PCA death + other death vs. alive)
-> **Class distribution:** 1,278 alive (60.6%), 832 deceased (39.4%) in test set
-> **Note on TabPFN:** TabPFN v2.6 (Prior-Labs) requer download de modelo gated via HuggingFace com aceite explícito de termos de uso (`https://huggingface.co/Prior-Labs/tabpfn_2_6`). O F1=0.6055 e CV F1=0.5752 foram obtidos em sessão anterior com autenticação ativa. Precision e sensitivity não estão disponíveis pois o modelo `.pkl` não é versionado no repositório (gitignore). Para reproduzir: `hf auth login` + `python run_pipeline.py --steps train evaluate`.
->
-> Full classification reports (positive class = Óbito/death):
-
-**LightGBM:**
-```
-              precision  sensitivity  f1-score   support
-        Vivo       0.80       0.73      0.76      1278
-       Óbito       0.63       0.72      0.67       832
-    accuracy                            0.72      2110
-   macro avg       0.71       0.72      0.71      2110
-weighted avg       0.73       0.72      0.72      2110
-```
-
-**Random Forest:**
-```
-              precision  sensitivity  f1-score   support
-        Vivo       0.79       0.73      0.76      1278
-       Óbito       0.63       0.71      0.67       832
-    accuracy                            0.72      2110
-   macro avg       0.71       0.72      0.71      2110
-weighted avg       0.73       0.72      0.71      2110
-```
-
-**XGBoost:**
-```
-              precision  sensitivity  f1-score   support
-        Vivo       0.80       0.66      0.73      1278
-       Óbito       0.59       0.75      0.66       832
-    accuracy                            0.70      2110
-   macro avg       0.70       0.71      0.69      2110
-weighted avg       0.72       0.70      0.70      2110
-```
+> **Best model:** LightGBM (test F1=0.515, AUC=0.764, accuracy=0.751)
+> **Classification target:** Death within 5 years of registration
+> **Class distribution (test):** 1,656 alive at 5 years; 454 deaths within 5 years
+> **Threshold:** 0.5 (fixed); class weighting used to handle imbalance
+> **Interpretation:** Fewer than half of patients flagged as high-risk actually died within 5 years (precision=0.44), consistent with a screening-oriented classifier that favours sensitivity over precision.
 
 ---
 
-## Table 4 — Survival Model Performance (Test Set)
+## Table 4 — Survival Model Performance (Overall Survival, Test Set)
 
-| Ranking | Model | Family | C-index | vs. CoxPH baseline |
-|---------|-------|--------|---------|---------------------|
-| 1 | **Gradient Boosting Survival Analysis** | Sequential boosting | **0.7093** | +0.0047 |
-| 2 | Random Survival Forest | Parallel ensemble (optimized) | 0.7070 | +0.0024 |
-| 3 | Coxnet Survival (ElasticNet) | Penalized Cox | 0.7059 | +0.0013 |
-| 4 | Cox Proportional Hazards | Linear (Cox classic) | 0.7046 | baseline |
-| 5 | Extra Survival Trees | Parallel ensemble (random) | 0.7045 | −0.0001 |
+| Rank | Model | C-index |
+|------|-------|---------|
+| 1 | **Random Survival Forest** | **0.696** |
+| 2 | Gradient Boosting Survival Analysis | 0.695 |
+| 3 | Coxnet Survival (ElasticNet) | 0.692 |
+| 3 | Extra Survival Trees | 0.692 |
+| 3 | Cox Proportional Hazards | 0.692 |
 
-> **Metric:** Harrell's C-index (concordance index) on held-out test set
-> **Test set:** n=2,110 patients, 832 events (39.4%)
-> **Consistent finding:** Boosting family (GBS) outperforms parallel ensembles (RSF, EST), mirroring the LightGBM > Random Forest advantage observed in classification
+> **Metric:** Harrell's C-index on held-out test set
+> **Outcome:** Overall survival (time from registration to death from any cause; right-censored)
+> **Key finding:** Range across models is only 0.004 — flexible tree ensembles and classical Cox model are practically indistinguishable, suggesting the prognostic signal is largely additive with the available administrative predictors.
+
+### Time-Dependent AUC (Random Survival Forest)
+
+| Horizon | AUC | Cases / Controls |
+|---------|-----|-----------------|
+| 1 year | 0.741 | 108 / 2,002 |
+| 3 years | 0.751 | 319 / 1,791 |
+| 5 years | 0.748 | 470 / 1,640 |
+| Mean | 0.747 | — |
+
+### Kaplan-Meier Stratified by Median Predicted Risk (RSF)
+
+| Group | n | Deaths | Death rate |
+|-------|---|--------|------------|
+| High-risk (above median) | 1,055 | 597 | 56.6% |
+| Low-risk (below median) | 1,055 | 235 | 22.3% |
+
+Log-rank p = 5.76 × 10^-45
 
 ### Model Hyperparameters (Survival)
 
@@ -143,12 +128,13 @@ weighted avg       0.72       0.70      0.70      2110
 
 ---
 
-## SurvSHAP(t) — Feature Importance (Gradient Boosting Survival)
+## SurvSHAP(t) — Feature Importance (Random Survival Forest)
 
-SurvSHAP(t) computed for the best survival model (GBS) using 25 test observations,
-B=25 permutations, sampling method. Results in:
+SurvSHAP(t) computed for the best survival model (RSF). Top predictors: clinical stage IV and age at diagnosis, followed by funding not applicable and unknown clinical stage. Results in:
 - `results/metrics/survshap_feature_importance.csv`
 - `results/plots/shap_surv_importance_bar.png`
+
+SHAP (classification, LightGBM) converged on the same hierarchy: clinical stage IV and age as the two dominant contributors, followed by unknown/not-applicable staging and funding indicators. Convergence between two methodologically distinct explainability frameworks reinforces that these signals are intrinsic to the data.
 
 ---
 
@@ -156,13 +142,15 @@ B=25 permutations, sampling method. Results in:
 
 | Finding | Value |
 |---------|-------|
-| Study population | 10,550 patients (RHC-ES + SIM linkage) |
-| Mortality rate | 39.5% (4,162/10,550) |
+| Study population | 10,552 patients (RHC-ES + SIM linkage) |
+| Mortality rate | 39.5% (4,164/10,552) |
 | Median follow-up | 7.5 years (IQR 5.3–10.9) |
-| Boruta features selected | 16 |
-| Best classifier | LightGBM (F1=0.6697, Accuracy=72%) |
-| Best survival model | Gradient Boosting Survival (C-index=0.7093) |
-| Top survival predictors | Clinical staging, pathological TNM, race, treatment cost indicators |
+| Boruta features selected | 13 |
+| Best classifier | LightGBM (F1=0.515, AUC=0.764, accuracy=75%) |
+| Best survival model | Random Survival Forest (C-index=0.696) |
+| Time-dependent AUC (RSF) | 0.741 (1yr), 0.751 (3yr), 0.748 (5yr) |
+| KM stratification | High-risk 56.6% vs low-risk 22.3% deaths (log-rank p=5.76e-45) |
+| Top predictors (SHAP + SurvSHAP) | Clinical stage IV, age at diagnosis, unknown staging, funding not applicable |
 
 ---
 

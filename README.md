@@ -10,34 +10,36 @@
 
 This repository contains the complete analysis pipeline for a study on machine learning-based survival prediction in prostate cancer patients using linked hospital cancer registry (RHC) and mortality database (SIM) data from Espírito Santo, Brazil.
 
-**Dataset:** 10,550 patients diagnosed with prostate cancer, with 4,162 deaths (39.5% overall mortality) and a median follow-up of 7.5 years (IQR 5.3–10.9).
+**Dataset:** 10,552 patients diagnosed with prostate cancer, with 4,164 deaths (39.5% overall mortality) and a median follow-up of 7.5 years (IQR 5.3–10.9).
 
-**Authors:** Fabiano Novaes Barcellos Filho, Wesley Rocha Grippa *et al.*
+**Authors:** Fabiano Novaes Barcellos Filho, Victor Hugo Ovani Marchetti, Wesley Rocha Grippa, Vitor Fiorin Vasconcellos, Luis Carlos Lopes-Junior
 
 ---
 
 ## Key Results
 
-### Classification (binary mortality prediction)
+### Classification (5-year mortality prediction, test set n=2,110)
 
-| Model | Test F1 | CV F1 | Accuracy |
-|-------|---------|-------|----------|
-| **LightGBM** | **0.6697** | **0.6275** | **0.72** |
-| Random Forest | 0.6667 | 0.5670 | 0.72 |
-| XGBoost | 0.6610 | 0.6236 | — |
-| TabPFN | 0.6055 | 0.5752 | — |
+| Model | Test F1 | AUC | Accuracy |
+|-------|---------|-----|----------|
+| **LightGBM** | **0.515** | **0.764** | **0.751** |
+| XGBoost | 0.507 | 0.764 | — |
+| Random Forest | 0.502 | 0.753 | — |
+| TabPFN | 0.405 | — | — |
 
-### Survival Analysis (Harrell's C-index)
+### Survival Analysis (Harrell's C-index, overall survival)
 
 | Rank | Model | C-index |
 |------|-------|---------|
-| 1 | **Gradient Boosting Survival** | **0.7093** |
-| 2 | Random Survival Forest | 0.7070 |
-| 3 | Coxnet Survival (ElasticNet) | 0.7059 |
-| 4 | Cox Proportional Hazards | 0.7046 |
-| 5 | Extra Survival Trees | 0.7045 |
+| 1 | **Random Survival Forest** | **0.696** |
+| 2 | Gradient Boosting Survival | 0.695 |
+| 3 | Coxnet Survival (ElasticNet) | 0.692 |
+| 3 | Extra Survival Trees | 0.692 |
+| 3 | Cox Proportional Hazards | 0.692 |
 
-**Feature selection:** 16 variables identified by Boruta (BorutaPy with RandomForestClassifier), including age, clinical staging (I–IV), pathological TNM, race/ethnicity, smoking status, clinical condition at presentation, and institutional indicators.
+Time-dependent AUC (RSF): 0.741 (1 year), 0.751 (3 years), 0.748 (5 years).
+
+**Feature selection:** 13 variables confirmed by Boruta (BorutaPy with RandomForestClassifier), including age at diagnosis, clinical staging (I, IV, unknown), pathological TNM, unknown occupation, unknown alcohol use, performance status, hospital unit (HUCAM), and funding indicators.
 
 See [`RESULTS.md`](RESULTS.md) for complete tables with descriptive statistics and model hyperparameters.
 
@@ -104,7 +106,7 @@ python run_pipeline.py --steps survival
 
 ### Feature Selection
 - **BorutaPy** with RandomForestClassifier (max_depth=7, n_estimators="auto", random_state=42)
-- 16 confirmed predictors retained
+- 13 confirmed predictors retained
 
 ### Classification Models
 - LightGBM, XGBoost, RandomForestClassifier, TabPFN
@@ -151,7 +153,7 @@ See `requirements.txt` for the full pinned dependency list.
 
 If you use this code or results, please cite:
 
-> Barcellos Filho FN, Grippa WR, et al. Machine learning for prostate cancer survival prediction using hospital-based cancer registry data in Brazil. *[Journal name upon acceptance]*, 2026.
+> Barcellos Filho FN, Marchetti VHO, Grippa WR, Vasconcellos VF, Lopes-Junior LC. Machine learning for prostate cancer survival prediction using hospital-based cancer registry data in Brazil: a retrospective cohort study. *[Journal name upon acceptance]*, 2026.
 
 ---
 
